@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<main>
+    <section class="section_top">
+        <div class="container"><br>
+            <div class="text_center">
+                <h2 class="section_title">Последняя запись</h2>
+            </div>
+            {% if current_user.is_authenticated %}
+                {% if last_appointment %}
+                    <section class="section_top">
+                        <div class="container">
+                            <div class="text_center">
+                                <div class="order_card">
+                                    <p class="order_id">{{ last_appointment.barber.barbershop.name }}</p>
+                                    <p class="order_time">Время: {{ last_appointment.date.strftime('%d.%m.%Y %H:%M') }}</p>
+                                    <p class="order_price">Сумма услуги: {{ total_price }} ₽</p>
+                                    <div class="status">Статус: {{ last_appointment.status }}</div>
+                                    {% if last_appointment.status != 'выполнен' %}
+                                        <form method="post" action="{{ url_for('complete_appointment', appointment_id=last_appointment.id_appointment) }}">
+                                            <button type="submit" class="btn btn-primary">Завершить стрижку</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    {% if last_appointment.status == 'выполнен' and not last_appointment.rating %}
+                        <div class="text_center">
+                            <div class="order_card">
+                                <p class="order_id">{{ last_appointment.barber.barbershop.name }}</p>
+                                <div class="d-flex">
+                                    <p class="barber_name">Парикмахер: {{ last_appointment.barber.first_name }} {{ last_appointment.barber.last_name }}</p>
+                                    <p class="order_time">Время: {{ last_appointment.date.strftime('%d.%m.%Y %H:%M') }}</p>
+                                </div>
+                                <p class="order_price">Сумма услуги: {{ total_price }} ₽</p>
+                                <div class="d-flex">
+                                    <div class="status">Статус: выполнен</div>
+                                    <a href="#" class="rating" onclick="document.getElementById('rating-form').style.display = 'block';">Оценить</a>
+                                </div>
+                                <form method="post" action="{{ url_for('rate_appointment', appointment_id=last_appointment.id_appointment) }}" id="rating-form" style="display: none;">
+                                    <div class="input_stars d-flex align-items-center">
+                                        {% for i in range(1, 6) %}
+                                        <div class="star-rating">
+                                            <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" required>
+                                            <label for="star{{ i }}">★</label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button class="status" type="submit">Отправить оценку</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text_center">
+                        <p>У вас еще нет записей.</p>
+                    </div>
+                {% endif %}
+                {% if not last_appointment %}
+
+                {% else %}
+                    <div class="text_center">
+                        <button class="btn btn-primary" onclick="toggleAppointments()">Показать все записи</button>
+                    </div>
+                {% endif %}
+                <section id="all-appointments" class="section_top" style="display: none;">
+                    <div class="container">
+                        <div class="text_center">
+                            <h2 class="section_title">Все записи</h2>
+                        </div>
+                            {% for appointment in all_appointments %}
+                                <div class="order_card">
+                                    <p class="order_id">{{ appointment.barber.barbershop.name }}</p>
+                                    <p class="order_time">Время: {{ appointment.date.strftime('%d.%m.%Y %H:%M') }}</p>
+                                    <p class="order_price">Сумма услуги: {{ appointment.total_price }} ₽</p>
+                                    <div class="status">Статус: {{ appointment.status }}</div>
+                                </div>
+                            {% endfor %}
+                    </div>
+                </section>
+            {% else %}
+                <div class="login"><h1>Войдите на сайт</h1></div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+<div class="modal login_modal">
+    <img class="modal_close" src="{{ url_for('static', filename ='images/modal_close.png') }}" alt="">
+    <div class="modal_title">Авторизация</div>
+    <form method="post" action="/">
+        <label>
+            <p>Почта</p>
+            <input type="email" name="email" placeholder="Ваша почта" required>
+        </label>
+        <label>
+            <p>Пароль</p>
+            <input type="password" name="password" placeholder="Ваш пароль" required>
+        </label>
+        <div class="text_center">
+            <button type="submit" name="login">ВОЙТИ</button>
+        </div>
+    </form>
+    <div class="text_center">
+        <div class="register_btn">Регистрация</div>
+    </div>
+</div>
+<div class="modal register_modal">
+    <div class="modal_title">Регистрация</div>
+    <form method="post" action="/">
+        <div class="inputs_wrap">
+            <label>
+                <p>Почта</p>
+                <input type="email" name="email" placeholder="Ваша почта" required>
+            </label>
+
+            <label>
+                <p>Пароль</p>
+                <input type="password" name="password" placeholder="Пароль" required>
+            </label>
+            <label>
+                <p>Имя</p>
+                <input type="text" name="first_name" placeholder="Ваше имя" required>
+            </label>
+            <label>
+                <p>Фамилия</p>
+                <input type="text" name="last_name" placeholder="Ваша фамилия" required>
+            </label>
+            
+            <label>
+                <p>Город</p>
+                <select name="city" required>
+                    <option selected disabled>Город</option>
+                    <option>Москва</option>
+                    <option>Санкт-Петербург</option>
+                    <option>Новосибирск</option>
+                    <option>Екатеринбург</option>
+                </select>
+            </label>
+
+            <div class="checkbox_wrap">
+                <p>Выберите пол</p>
+                <div>
+                    <label>
+                        <input type="radio" name="gender" value="Муж." required>
+                        Муж.
+                    </label>
+                    <label>
+                        <input type="radio" name="gender" value="Жен." required>
+                        Жен.
+                    </label>
+                </div>
+            </div>
+        </div>
+        <button type="submit" name="register">Зарегистрироваться</button>
+        <div class="text_center">
+            <div class="cancel">Назад</div>
+        </div>
+    </form>
+</div>
+<div class="modal_back"></div>
+<main>
+    <section class="section_bottom">
+        <div class="container"><br>
+            <div class="text_center">
+                <h2 class="section_title">Все парикмахерские</h2>
+            </div><br>
+            <div class="items_row">
+            {% for barbershop in barbershops %}
+                <div class="item">
+                    <div class="item_image">
+                       <a href="{{ url_for('page', id_barbershop=barbershop.id_barbershop) }}"> <img src="{{ barbershop.image }}" alt=""> </a>
+                    </div>
+                    <div class="item_title">{{ barbershop.name }}</div>
+                    <p class="work_time">Время работы <br> {{ barbershop.worktime_start }} - {{ barbershop.worktime_end }}</p>
+                    <p class="work_time">Город <br> {{ barbershop.namecity }}</p>
+                    <div class="rating">
+                        <img src="{{ url_for('static', filename ='images/rating_icon.png') }}" alt="">
+                        {{ barbershop.rating }}
+                    </div>                       
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </section>
+</main>
+<script>
+    function toggleAppointments() {
+        var x = document.getElementById("all-appointments");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
+{% endblock %}

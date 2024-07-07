@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename ='images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename ='fonts/fonts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename ='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename ='libs/air-datepicker.css') }}">
+    <title>Barbershop</title>
+</head>
+    <body>
+        <div class="wrapper">
+            <header>
+                <div>
+                    <div class="header_row">
+                        <a href="/" class="brand_logo">
+                            <img src="{{ url_for('static', filename ='images/logo.png') }}" alt="logo">
+                        </a>
+                        <div class="header_right">
+                            <form method="get" action="{{ url_for('search') }}">
+                                <input type="text" name="query" placeholder="Найти парикмахерскую">
+                                <select name="sort_by">
+                                    <option value="rating_desc">По убыванию</option>
+                                    <option value="rating_asc">По возрастанию</option>
+                                </select>
+                                <button type="submit">НАЙТИ</button>
+                            </form>
+                            <div class="select_city">
+                                <img src="{{ url_for('static', filename ='images/location_icon.svg') }}" alt="">
+                                {% if current_user.is_authenticated %}
+                                    {{current_user.city}}
+                                {% else %}
+                                    Город
+                                {% endif %}
+                            </div>
+                            {% if current_user.is_authenticated %}
+                                <select class="login_admin" onchange="window.location.href = this.options[this.selectedIndex].value">
+                                    <option value="/" selected>{{current_user.first_name}}</option>
+                                    {% if current_user.role == "admin" %}
+                                        <option value="{{ url_for('add_barbershop') }}">Доб. барбершоп</option>
+                                        <option value="{{ url_for('add_barber') }}">Доб. барбера</option>
+                                        <option value="{{ url_for('add_service') }}">Доб. услугу</option>
+                                        <option value="{{ url_for('add_barbershop_service') }}">Доб. услугу барбершопа</option>
+                                    {% endif %}
+                                    <option value="{{url_for('logout')}}">Выход</option>
+                                </select>
+                            {% else %}
+                                <div class="login">Войти</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </div>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <h3 class="message_alert">{{ message }}<h3>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+    {% block body %} {% endblock %} 
+    <script>
+        document.querySelector('.login').addEventListener('click', function(){
+            document.querySelector('.login_modal').classList.add('active')
+        })
+        document.querySelector('.modal_close').addEventListener('click', function(){
+            document.querySelector('.login_modal').classList.remove('active')
+        })
+        document.querySelector('.register_btn').addEventListener('click', function(){
+            document.querySelector('.login_modal').classList.remove('active')
+            document.querySelector('.register_modal').classList.add('active')
+        })
+        document.querySelector('.cancel').addEventListener('click', function(){
+            document.querySelector('.register_modal').classList.remove('active')
+        })
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename ='libs/air-datepicker.js') }}"></script>   
+    </body>
+</html>

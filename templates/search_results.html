@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<main>
+    <section>
+        <div class="container">
+            <div class="text_center">
+                <h2 class="section_title">Результаты поиска</h2>
+            </div>
+            <div class="items_row">
+                {% for barbershop in barbershops %}
+                    <div class="item">
+                        <div class="item_image">
+                           <a href="{{ url_for('page', id_barbershop=barbershop.id_barbershop) }}"> <img src="{{ barbershop.image }}" alt=""> </a>
+                        </div>
+                        <div class="item_title">{{ barbershop.name }}</div>
+                        <p class="work_time">Время работы <br> {{ barbershop.worktime_start }} - {{ barbershop.worktime_end }}</p>
+                        <p class="work_time">Город <br> {{ barbershop.namecity }}</p>
+                        <div class="rating">
+                            <img src="{{ url_for('static', filename ='images/rating_icon.png') }}" alt="">
+                            {{ barbershop.rating }}
+                        </div>                       
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+

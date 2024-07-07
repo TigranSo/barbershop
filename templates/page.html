@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<main class="page">
+    <section>
+        <form method="post" class="container">
+            <div class="section_top">
+                <a href="/" class="back">
+                    <img src="{{ url_for('static', filename='images/modal_close.png') }}" alt="">
+                    Назад
+                </a>
+                <div class="select_block">
+                    Пол: 
+                    <label>
+                        Мужской
+                        <input type="radio" name="gender" value="male">
+                    </label>
+                    <label>
+                        Женский
+                        <input type="radio" name="gender" value="female">
+                    </label>
+                </div>
+            </div>
+            <div class="items_row">
+                <div class="item">
+                    <div class="item_image">
+                        <img src="{{ barbershop.image }}" alt="">
+                    </div>
+                    <div class="item_title">{{ barbershop.name }}</div>
+                    <div class="adress">ул. Пушкина, д. 53</div>
+                    <p class="work_time">Время работы <br> {{ barbershop.worktime_start }} - {{ barbershop.worktime_end }}</p>
+                    <p class="work_time">Город <br> {{ barbershop.namecity }}</p>
+                    <div class="rating">
+                        <img src="{{ url_for('static', filename='images/rating_icon.png') }}" alt="">
+                        {{ barbershop.rating }}
+                    </div>
+                </div>
+                <div class="select_barber">
+                    <label for="barber">Выберите мастера:</label>
+                    <select name="barber" id="barber">
+                        {% for barber in barbers %}
+                            <option value="{{ barber.id_barber }}">{{ barber.first_name }} {{ barber.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="select_services">
+                    <label for="services">Выберите услуги:</label>
+                    {% for service in services %}
+                    <label>
+                        <input type="checkbox" name="services" value="{{ service.id_barbershop_service }}" data-price="{{ service.price }}">
+                        <span class="checkmark"></span>
+                        <p>{{ service.service.description }} <br> {{ service.price }} ₽</p>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="page_actions">
+                <div class="all_price">Итог: <span id="total_price_display">0</span> ₽</div>
+                <button type="submit">Продолжить</button>
+                <input type="hidden" name="total_price" id="total_price" value="0">
+            </div>
+        </form>
+    </section>
+</main>
+<script>
+    var checkboxes = document.querySelectorAll('input[name="services"]');
+    var totalPriceSpan = document.getElementById('total_price_display');
+    var totalPriceInput = document.getElementById('total_price');
+
+    function updateTotalPrice() {
+        var total = 0;
+        checkboxes.forEach(function(checkbox) {
+            if (checkbox.checked) {
+                total += parseFloat(checkbox.dataset.price);
+            }
+        });
+        totalPriceSpan.textContent = total;
+        totalPriceInput.value = total;
+    }
+
+    checkboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', updateTotalPrice);
+    });
+
+    updateTotalPrice();
+</script>
+{% endblock %}
