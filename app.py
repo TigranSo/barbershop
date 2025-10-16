@@ -13,7 +13,7 @@ from flask_admin.contrib.sqla import ModelView
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///base.db'
-app.config['SECRET_KEY'] = 'rgreg74lp874qd14s1a56wer'
+app.config['SECRET_KEY'] = ''
 db = SQLAlchemy(app)
 admin = Admin(app, template_mode='bootstrap4')
 migrate = Migrate(app, db)
@@ -413,3 +413,4 @@ def search():
        
 if __name__ == '__main__':
     app.run(debug=True)
+
